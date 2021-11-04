@@ -1,8 +1,8 @@
 import pickle
 import sys
 from PyQt5.QtWidgets import (QWidget, QPushButton,
-                             QHBoxLayout, QVBoxLayout, QApplication, QLabel,
-                             QComboBox, QTextEdit, QLineEdit)
+    QHBoxLayout, QVBoxLayout, QApplication, QLabel,
+    QComboBox, QTextEdit, QLineEdit)
 from PyQt5.QtCore import Qt
 
 
@@ -32,7 +32,6 @@ class ScoreDB(QWidget):
         self.AmountEdit = QLineEdit()
         self.KeyEdit = QComboBox()
         self.ResultEdit = QTextEdit()
-        self.ResultEdit.setReadOnly(True)
 
         addButten = QPushButton("Add")
         delButten = QPushButton("Del")
@@ -40,9 +39,9 @@ class ScoreDB(QWidget):
         incButten = QPushButton("Inc")
         showButten = QPushButton("Show")
 
-        self.KeyBox.addItem("Name")
-        self.KeyBox.addItem("Age")
-        self.KeyBox.addItem("Score")
+        self.KeyEdit.addItem('Name')
+        self.KeyEdit.addItem('Age')
+        self.KeyEdit.addItem('Score')
 
         hbox0 = QHBoxLayout()
         hbox0.addStretch(1)
@@ -58,7 +57,7 @@ class ScoreDB(QWidget):
         hbox1.addWidget(Amount)
         hbox1.addWidget(self.AmountEdit)
         hbox1.addWidget(Key)
-        hbox1.addWidget(self.KeyBox)
+        hbox1.addWidget(self.KeyEdit)
 
         hbox2 = QHBoxLayout()
         hbox2.addStretch(1)
@@ -73,19 +72,15 @@ class ScoreDB(QWidget):
         hbox3.addStretch(1)
 
         hbox4 = QHBoxLayout()
-        hbox4.addWidget(self.ResultText)
+        hbox4.addWidget(self.ResultEdit)
 
         vbox = QVBoxLayout()
+        vbox.addStretch(1)
         vbox.addLayout(hbox0)
         vbox.addLayout(hbox1)
         vbox.addLayout(hbox2)
         vbox.addLayout(hbox3)
         vbox.addLayout(hbox4)
-        vbox.addStretch(1)
-
-        self.setLayout(vbox)
-        self.setGeometry(300, 300, 500, 300)
-        self.show()
 
         addButten.clicked.connect(self.addclicked)
         delButten.clicked.connect(self.delclicked)
@@ -93,11 +88,15 @@ class ScoreDB(QWidget):
         incButten.clicked.connect(self.incclicked)
         showButten.clicked.connect(self.showScoreDB)
 
+        self.setLayout(vbox)
+        self.setGeometry(300, 300, 500, 250)
+        self.show()
+
     def addclicked(self):
         name = self.NameEdit.text()
-        age = self.AgeEdit.text()
-        score = self.ScoreEdit.text()
-        self.scoredb.append({'Name': name, 'Age': int(age), 'Score': int(score)})
+        age = int(self.AgeEdit.text())
+        score = int(self.ScoreEdit.text())
+        self.scoredb.append({'Name': name, 'Age': age, 'Score': score})
         self.showScoreDB()
 
     def delclicked(self):
@@ -110,14 +109,14 @@ class ScoreDB(QWidget):
                 if p['Name'] == name:
                     self.scoredb.remove(p)
                     del_over = True
+
         self.showScoreDB()
 
     def findclicked(self):
         name = self.NameEdit.text()
         for p in self.scoredb:
-            if p['Name'] == Name:
-                print("Age=" + str(p['Age']), "Name=" + p['Name'], "Score=" + str(p['Score']))
-        self.showScoreDB()
+            if p['Name'] == name:
+        self.showScoreDB(name)
 
     def incclicked(self):
         name = self.NameEdit.text()
@@ -146,12 +145,15 @@ class ScoreDB(QWidget):
             pass
         fH.close()
 
+
+    # write the data into person db
     def writeScoreDB(self):
         fH = open(self.dbfilename, 'wb')
         pickle.dump(self.scoredb, fH)
         fH.close()
 
     def showScoreDB(self):
+
         key_name = self.KeyBox.currentText()
         ke = []
         for p in sorted(self.scoredb, key=lambda person: person[key_name]):
